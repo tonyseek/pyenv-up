@@ -1,0 +1,199 @@
+#!/usr/bin/env bash
+#
+# Summary: Startup the virtual environment
+#
+# Usage: pyenv up
+#
+
+set -e
+[ -n "$PYENV_DEBUG" ] && set -x
+
+prompt() {
+    builtin echo "pyenv:" "$@"
+}
+
+prompt_inline() {
+    builtin echo -n "pyenv:" "$@"
+}
+
+prompt_hr() {
+    prompt "------------------------------------------------------------"
+}
+
+find_local_file() {
+  local root="$1"
+  local target="$2"
+  while [ -n "$root" ]; do
+    if [ -e "${root}/${target}" ]; then
+      echo "${root}/${target}"
+      exit
+    elif [ -e "${root}/${target}" ]; then
+      echo "${root}/${target}"
+      exit
+    fi
+    [ "${root}" = "${root%/*}" ] && break
+    root="${root%/*}"
+  done
+}
+
+#
+# finds or creates .python-virtualenv
+#
+VIRTUALENV_NAME=""
+VIRTUALENV_FILE=$(find_local_file "$PYENV_DIR" ".python-virtualenv")
+VIRTUALENV_FILE_CREATED=0
+if [ -f "${VIRTUALENV_FILE}" ]; then
+    VIRTUALENV_NAME="$(cat ${VIRTUALENV_FILE})"
+fi
+if [ -z "${VIRTUALENV_NAME}" ]; then
+    if [ -f "${VIRTUALENV_FILE}" ]; then
+        VIRTUALENV_NAME=$(basename $(dirname ${VIRTUALENV_FILE}))
+    else
+        VIRTUALENV_NAME=$(basename ${PWD})
+        VIRTUALENV_FILE="${PWD}/.python-virtualenv"
+    fi
+    prompt "Please name the project's virtualenv."
+    prompt
+    prompt "The name will be written into the file .python-virtualenv which"
+    prompt "could be checked into yourversion control system."
+    prompt
+    prompt_inline "Enter the name (${VIRTUALENV_NAME}): "
+
+    read ANSWER
+    [[ -n ${ANSWER} ]] && VIRTUALENV_NAME=${ANSWER}
+
+    echo ${VIRTUALENV_NAME} > ${VIRTUALENV_FILE} && VIRTUALENV_FILE_CREATED=1
+    prompt "${VIRTUALENV_FILE} has been created."
+fi
+
+#
+# finds or creates the virtualenvs directory
+#
+VIRTUALENV_DIR="${PYENV_ROOT}/virtualenvs"
+if [ ! -d $VIRTUALENV_DIR ]; then
+    [[ "$VIRTUALENV_FILE_CREATED" = "1" ]] && prompt  # empty line
+    prompt "The working directory $VIRTUALENV_DIR not exists yet."
+    prompt "Do you need to create it now?"
+
+    while true; do
+        prompt_inline "(Y/n) "
+
+        read ANSWER
+        [[ -z $ANSWER ]] && ANSWER="y"
+
+        case $ANSWER in
+            [Yy]* )
+                mkdir -p $VIRTUALENV_DIR
+                prompt "$VIRTUALENV_DIR has been created."
+                break
+                ;;
+            [Nn]* )
+                prompt "Abort."
+                exit -1
+                ;;
+        esac
+    done
+fi
+
+#
+# finds and creates the virtualenv
+#
+if [ -z "${VIRTUALENV_NAME}" ]; then
+    prompt "The virtualenv name is empty. Please report this bug to"
+    prompt " https://github.com/tonyseek/pyenv-up/issues"
+    exit -1
+fi
+VIRTUALENV_FULL_PATH="${VIRTUALENV_DIR}/${VIRTUALENV_NAME}"
+VIRTUALENV_PYTHON_PATH="$(pyenv-which python)"
+VIRTUALENV_OPTS=""
+if [ -f "${VIRTUALENV_PYTHON_PATH}" ]; then
+    VIRTUALENV_OPTS="${VIRTUALENV_OPTS} -p ${VIRTUALENV_PYTHON_PATH}"
+fi
+if [ ! -d "${VIRTUALENV_FULL_PATH}" ]; then
+    prompt "The virtualenv '${VIRTUALENV_NAME}' has not been created yet."
+    prompt "Do you need to create it now?"
+
+    while true; do
+        prompt_inline "(Y/n) "
+
+        read ANSWER
+        [[ -z $ANSWER ]] && ANSWER="y"
+
+        case $ANSWER in
+            [Yy]* )
+                prompt_hr
+                virtualenv ${VIRTUALENV_OPTS} ${VIRTUALENV_FULL_PATH}
+                # install the latest setuptools and pip
+                $VIRTUALENV_FULL_PATH/bin/pip install -U setuptools
+                $VIRTUALENV_FULL_PATH/bin/pip install -U pip
+                prompt_hr
+                prompt "The virtualenv '${VIRTUALENV_NAME}' has been created."
+                break
+                ;;
+            [Nn]* )
+                prompt "Abort."
+                exit -1
+                ;;
+        esac
+    done
+fi
+
+#
+# activate the virtualenv
+#
+LOCAL_ENV_FILE=$(find_local_file "$PYENV_DIR" ".env")
+if [ -f "${LOCAL_ENV_FILE}" ]; then
+    # apply the .env file
+    export $(cat "${LOCAL_ENV_FILE}" | grep '^[^#]' | xargs)
+fi
+
+VIRTUALENV_ACTIVATE="${VIRTUALENV_FULL_PATH}/bin/activate"
+if [ -f "${VIRTUALENV_ACTIVATE}" ]; then
+    . ${VIRTUALENV_ACTIVATE}
+    export USER_PATH="${VIRTUALENV_FULL_PATH}/bin:${USER_PATH}"
+else
+    prompt "It seems ${VIRTUALENV_FULL_PATH} is a broken virtualenv."
+    prompt "You may need to remove it and run 'pyenv up' again."
+    exit -1
+fi
+
+
+#
+# install the dependencies
+#
+REQUIREMENTS_FILES=$(find $PWD \
+    -maxdepth 1 \
+    -name 'requirements*.txt' -o \
+    -name 'requirements/*.txt' | sort -r)
+REQUIREMENTS_FREEZE="$($VIRTUALENV_FULL_PATH/bin/pip freeze \
+    | { grep -v '^wsgiref' || true; })"
+if [ -z "${REQUIREMENTS_FREEZE}" ]; then
+    prompt "It seems the virtualenv:${VIRTUALENV_NAME} is fresh."
+    for req in $REQUIREMENTS_FILES; do
+        prompt "Do you wish to install dependencies from $(basename $req)?"
+        while true; do
+            prompt_inline "(Y/n) "
+
+            read ANSWER
+            [[ -z $ANSWER ]] && ANSWER="y"
+
+            case $ANSWER in
+                [Yy]* )
+                    prompt_hr
+                    $VIRTUALENV_FULL_PATH/bin/pip install -r $req
+                    prompt_hr
+                    break
+                    ;;
+                [Nn]* )
+                    break
+                    ;;
+            esac
+        done
+    done
+fi
+
+
+#
+# start the shell
+#
+exec ${SHELL:-/bin/sh}
