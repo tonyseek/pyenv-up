@@ -1,0 +1,5 @@
+/libexec/pyenv-up/*/*.pyc
+/libexec/pyenv-up/*/*.pyo
+/libexec/pyenv-up/*/__pycache__
+*.swo
+*.swp
