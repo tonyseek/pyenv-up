@@ -23,7 +23,7 @@ You can install it as a pyenv plugin.
 Usage
 -----
 
-1. Check the runtime description file into your VCS::
+1. Check the runtime description files into your VCS::
 
    $ cd path/to/project
    $ echo '2.7.8' > .python-version  # or pyenv local 2.7.8
@@ -31,7 +31,7 @@ Usage
    $ git add .python-version .python-virtualenv
    $ git commit
 
-2. Say "up"::
+2. Say "up" now::
 
    $ pyenv up
 
