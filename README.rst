@@ -43,7 +43,7 @@ be opened. You can work in that and exit with ``Ctrl - D`` simply in the end.
 Principle
 ---------
 
-The ``pyenv up`` will do those in the new opening shell:
+The ``pyenv up`` will do following actions in the new opening shell:
 
 - Checking the ``$PYENV_ROOT/virtualenvs`` directory and creating the
   project-specific virtualenv in first time. The virtualenv's name is from
