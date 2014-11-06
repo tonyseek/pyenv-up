@@ -1,7 +1,7 @@
 pyenv-up
 ========
 
-|License MIT|
+|License Image| |Stage Image|
 
 Startup pyenv_ and virtualenv_ through ``pyenv up``.
 
@@ -76,6 +76,9 @@ Welcome to contribute to this project with `GitHub Pull Requests`_.
 .. _GitHub Issues: https://github.com/tonyseek/pyenv-up/issues
 .. _GitHub Pull Requests: https://github.com/tonyseek/pyenv-up/pulls
 
-.. |License MIT| image:: https://img.shields.io/badge/license-MIT-orange.svg?style=flat
+.. |License Image| image:: https://img.shields.io/badge/license-MIT-orange.svg?style=flat
    :target: LICENSE
    :alt: License - MIT
+.. |Stage Image| image:: https://img.shields.io/badge/stage-WIP-yellow.svg?style=flat
+   :target: https://github.com/tonyseek/pyenv-up/issues
+   :alt: Stage - WIP (DO NOT USE IN PRODUCTION)
