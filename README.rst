@@ -15,7 +15,7 @@ You can install it as a pyenv plugin.
 
    $ git clone https://github.com/tonyseek/pyenv-up.git $PYENV_ROOT/plugins/pyenv-up
 
-2. Create a the directory in order to contain the collection of virtualenv::
+2. Create a empty directory to contain the collection of virtualenvs::
 
    $ mkdir $PYENV_ROOT/virtualenvs
 
