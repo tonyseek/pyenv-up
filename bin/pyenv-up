@@ -37,6 +37,20 @@ find_local_file() {
 }
 
 #
+# ensures pyenv installed
+#
+if [ -z "$PYENV_ROOT" ]; then
+    echo "PYENV_ROOT is undefined." >&2
+    echo "Please ensure the pyenv is installed well." >&2
+    exit -1
+fi
+if [ -z "$(command -v pyenv)" ]; then
+    echo "pyenv is not found in your PATH." >&2
+    echo "Please ensure the pyenv is installed well." >&2
+    exit -1
+fi
+
+#
 # finds or creates .python-virtualenv
 #
 VIRTUALENV_NAME=""
