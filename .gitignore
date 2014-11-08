@@ -3,3 +3,4 @@
 /libexec/pyenv-up/*/__pycache__
 *.swo
 *.swp
+*.log
