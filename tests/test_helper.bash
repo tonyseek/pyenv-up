@@ -31,8 +31,8 @@ flunk() {
 
 assert_equal() {
   if [ "$1" != "$2" ]; then
-    { echo "expected: $1"
-      echo "actual:   $2"
+    { echo "expected: $2"
+      echo "actual:   $1"
     } | flunk
   fi
 }
