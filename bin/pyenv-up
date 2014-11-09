@@ -36,7 +36,7 @@ find_local_file() {
   done
 }
 
-usage() {
+option_usage() {
     echo "Usage: pyenv up [OPTIONS]" >&2
     echo >&2
     echo "Options:" >&2
@@ -46,8 +46,35 @@ usage() {
     exit 0
 }
 
+option_list() {
+    local virtualenvsdir="${PYENV_ROOT}/virtualenvs"
+    if [ -z "${virtualenvsdir}" ]; then
+        echo "The ${virtualenvsdir} does not exist." >&2
+        exit 1
+    fi
+
+    local virtualenvs="$(ls ${virtualenvsdir})"
+    if [ -z "${virtualenvs}" ]; then
+        echo "There is nothing :(" >&2
+        exit 0
+    fi
+
+    echo "Existent virtualenvs:" >&2
+    for name in $virtualenvs; do
+        local virtualenvpath="${virtualenvsdir}/${name}"
+        if [ -f "${virtualenvpath}/bin/activate" ]; then
+            echo -n ' * ' >&2
+            echo -n ${name}
+            echo -n " (${virtualenvpath})" >&2
+            echo
+        fi
+    done
+    exit 0
+}
+
 case $1 in
-    --help | --usage | -h ) usage;;
+    --help | --usage | -h ) option_usage;;
+    --list | -l ) option_list;;
 esac
 
 #
