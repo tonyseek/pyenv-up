@@ -9,17 +9,17 @@ load test_helper
 }
 
 @test "accept the .python-virtualenv which existed" {
-    echo '_lumpy' > .python-virtualenv  # ensure it does exist
+    echo "${TESTING_VENV_NAME}" > .python-virtualenv  # ensure it does exist
     run capture-and-term.py -- pyenv up  # take one line only
-    [ "${lines[0]}" = "pyenv: The virtualenv '_lumpy' has not been created yet." ]
+    [ "${lines[0]}" = "pyenv: The virtualenv '${TESTING_VENV_NAME}' has not been created yet." ]
 }
 
 @test "pick the .python-virtualenv in sub-directory." {
-    echo '_lumpy' > .python-virtualenv
+    echo "${TESTING_VENV_NAME}" > .python-virtualenv
     mkdir trees
     cd trees
     run capture-and-term.py -- pyenv up
-    [ "${lines[0]}" = "pyenv: The virtualenv '_lumpy' has not been created yet." ]
+    [ "${lines[0]}" = "pyenv: The virtualenv '${TESTING_VENV_NAME}' has not been created yet." ]
 
     rm -f ../.python-virtualenv
     run capture-and-term.py -- pyenv up

@@ -13,8 +13,10 @@ export PATH="${PYENV_UP_PATH}:${PYENV_PATH}:/bin:/usr/bin:/usr/local/bin"
 setup() {
     mkdir -p "${PROJECT_DIR}"
     cd "${PROJECT_DIR}"
+    export TESTING_VENV_NAME="_lumpy"
 }
 
 teardown() {
     rm -rf "${WORKING_DIR}"
+    rm -rf "${PYENV_ROOT}/virtualenvs/${TESTING_VENV_NAME}"
 }
