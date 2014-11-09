@@ -72,9 +72,12 @@ option_list() {
     exit 0
 }
 
+RENEW_VIRTUALENV=0
+
 case $1 in
     --help | --usage | -h ) option_usage;;
     --list | -l ) option_list;;
+    --renew | -r ) RENEW_VIRTUALENV=1;;
 esac
 
 #
@@ -163,6 +166,26 @@ VIRTUALENV_PYTHON_PATH="$(pyenv-which python)"
 VIRTUALENV_OPTS=""
 if [ -f "${VIRTUALENV_PYTHON_PATH}" ]; then
     VIRTUALENV_OPTS="${VIRTUALENV_OPTS} -p ${VIRTUALENV_PYTHON_PATH}"
+fi
+if [ $RENEW_VIRTUALENV -eq 1 ]; then
+    prompt "Are you sure to destory ${VIRTUALENV_FULL_PATH}?"
+    while true; do
+        prompt_inline "(y/N) "
+
+        read ANSWER
+        [[ -z $ANSWER ]] && ANSWER="n"
+
+        case $ANSWER in
+            [Yy]* )
+                rm -rf "${VIRTUALENV_FULL_PATH}"
+                prompt "${VIRTUALENV_FULL_PATH} has been removed."
+                break
+                ;;
+            [Nn]* )
+                break
+                ;;
+        esac
+    done
 fi
 if [ ! -d "${VIRTUALENV_FULL_PATH}" ]; then
     prompt "The virtualenv '${VIRTUALENV_NAME}' has not been created yet."
