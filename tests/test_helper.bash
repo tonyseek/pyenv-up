@@ -20,3 +20,19 @@ teardown() {
     rm -rf "${WORKING_DIR}"
     rm -rf "${PYENV_ROOT}/virtualenvs/${TESTING_VENV_NAME}"
 }
+
+flunk() {
+  { if [ "$#" -eq 0 ]; then cat -
+    else echo "$@"
+    fi
+  } | sed "s:${WORKING_DIR}:TEST_DIR:g" >&2
+  return 1
+}
+
+assert_equal() {
+  if [ "$1" != "$2" ]; then
+    { echo "expected: $1"
+      echo "actual:   $2"
+    } | flunk
+  fi
+}
