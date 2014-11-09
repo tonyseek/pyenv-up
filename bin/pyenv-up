@@ -36,6 +36,50 @@ find_local_file() {
   done
 }
 
+option_usage() {
+    echo "Usage: pyenv up [OPTIONS]" >&2
+    echo >&2
+    echo "Options:" >&2
+    echo -e '\t'"--help/-h"'\t'"Show help information." >&2
+    echo -e '\t'"--renew/-r"'\t'"Destroy the virtualenv and re-create it." >&2
+    echo -e '\t'"--list/-l"'\t'"List all existent virtualenvs." >&2
+    exit 0
+}
+
+option_list() {
+    local virtualenvsdir="${PYENV_ROOT}/virtualenvs"
+    if [ -z "${virtualenvsdir}" ]; then
+        echo "The ${virtualenvsdir} does not exist." >&2
+        exit 1
+    fi
+
+    local virtualenvs="$(ls ${virtualenvsdir})"
+    if [ -z "${virtualenvs}" ]; then
+        echo "There is nothing :(" >&2
+        exit 0
+    fi
+
+    echo "Existent virtualenvs:" >&2
+    for name in $virtualenvs; do
+        local virtualenvpath="${virtualenvsdir}/${name}"
+        if [ -f "${virtualenvpath}/bin/activate" ]; then
+            echo -n ' * ' >&2
+            echo -n ${name}
+            echo -n " (${virtualenvpath})" >&2
+            echo
+        fi
+    done
+    exit 0
+}
+
+RENEW_VIRTUALENV=0
+
+case $1 in
+    --help | --usage | -h ) option_usage;;
+    --list | -l ) option_list;;
+    --renew | -r ) RENEW_VIRTUALENV=1;;
+esac
+
 #
 # ensures pyenv installed
 #
@@ -122,6 +166,26 @@ VIRTUALENV_PYTHON_PATH="$(pyenv-which python)"
 VIRTUALENV_OPTS=""
 if [ -f "${VIRTUALENV_PYTHON_PATH}" ]; then
     VIRTUALENV_OPTS="${VIRTUALENV_OPTS} -p ${VIRTUALENV_PYTHON_PATH}"
+fi
+if [ $RENEW_VIRTUALENV -eq 1 ]; then
+    prompt "Are you sure to destory ${VIRTUALENV_FULL_PATH}?"
+    while true; do
+        prompt_inline "(y/N) "
+
+        read ANSWER
+        [[ -z $ANSWER ]] && ANSWER="n"
+
+        case $ANSWER in
+            [Yy]* )
+                rm -rf "${VIRTUALENV_FULL_PATH}"
+                prompt "${VIRTUALENV_FULL_PATH} has been removed."
+                break
+                ;;
+            [Nn]* )
+                break
+                ;;
+        esac
+    done
 fi
 if [ ! -d "${VIRTUALENV_FULL_PATH}" ]; then
     prompt "The virtualenv '${VIRTUALENV_NAME}' has not been created yet."
