@@ -36,6 +36,20 @@ find_local_file() {
   done
 }
 
+usage() {
+    echo "Usage: pyenv up [OPTIONS]" >&2
+    echo >&2
+    echo "Options:" >&2
+    echo -e '\t'"--help/-h"'\t'"Show help information." >&2
+    echo -e '\t'"--renew/-r"'\t'"Destroy the virtualenv and re-create it." >&2
+    echo -e '\t'"--list/-l"'\t'"List all existent virtualenvs." >&2
+    exit 0
+}
+
+case $1 in
+    --help | --usage | -h ) usage;;
+esac
+
 #
 # ensures pyenv installed
 #
