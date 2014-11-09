@@ -1,7 +1,7 @@
 pyenv-up
 ========
 
-|License Image| |Stage Image|
+|License Image| |Stage Image| |Build Image|
 
 Startup pyenv_ and virtualenv_ through ``pyenv up``.
 
@@ -82,3 +82,6 @@ Welcome to contribute to this project with `GitHub Pull Requests`_.
 .. |Stage Image| image:: https://img.shields.io/badge/stage-WIP-yellow.svg?style=flat
    :target: https://github.com/tonyseek/pyenv-up/issues
    :alt: Stage - WIP (DO NOT USE IN PRODUCTION)
+.. |Build Image| image:: https://img.shields.io/travis/tonyseek/pyenv-up.svg?style=flat
+   :target: https://travis-ci.org/tonyseek/pyenv-up
+   :alt: Travis CI

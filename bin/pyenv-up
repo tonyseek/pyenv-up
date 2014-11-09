@@ -37,10 +37,24 @@ find_local_file() {
 }
 
 #
+# ensures pyenv installed
+#
+if [ -z "$PYENV_ROOT" ]; then
+    echo "PYENV_ROOT is undefined." >&2
+    echo "Please ensure the pyenv is installed well." >&2
+    exit 1
+fi
+if [ -z "$(command -v pyenv)" ]; then
+    echo "pyenv is not found in your PATH." >&2
+    echo "Please ensure the pyenv is installed well." >&2
+    exit 1
+fi
+
+#
 # finds or creates .python-virtualenv
 #
 VIRTUALENV_NAME=""
-VIRTUALENV_FILE=$(find_local_file "$PYENV_DIR" ".python-virtualenv")
+VIRTUALENV_FILE=$(find_local_file "$PWD" ".python-virtualenv")
 VIRTUALENV_FILE_CREATED=0
 if [ -f "${VIRTUALENV_FILE}" ]; then
     VIRTUALENV_NAME="$(cat ${VIRTUALENV_FILE})"
@@ -89,7 +103,7 @@ if [ ! -d $VIRTUALENV_DIR ]; then
                 ;;
             [Nn]* )
                 prompt "Abort."
-                exit -1
+                exit 1
                 ;;
         esac
     done
@@ -101,7 +115,7 @@ fi
 if [ -z "${VIRTUALENV_NAME}" ]; then
     prompt "The virtualenv name is empty. Please report this bug to"
     prompt " https://github.com/tonyseek/pyenv-up/issues"
-    exit -1
+    exit 1
 fi
 VIRTUALENV_FULL_PATH="${VIRTUALENV_DIR}/${VIRTUALENV_NAME}"
 VIRTUALENV_PYTHON_PATH="$(pyenv-which python)"
@@ -132,7 +146,7 @@ if [ ! -d "${VIRTUALENV_FULL_PATH}" ]; then
                 ;;
             [Nn]* )
                 prompt "Abort."
-                exit -1
+                exit 1
                 ;;
         esac
     done
@@ -141,7 +155,7 @@ fi
 #
 # activate the virtualenv
 #
-LOCAL_ENV_FILE=$(find_local_file "$PYENV_DIR" ".env")
+LOCAL_ENV_FILE=$(find_local_file "$PWD" ".env")
 if [ -f "${LOCAL_ENV_FILE}" ]; then
     # apply the .env file
     export $(cat "${LOCAL_ENV_FILE}" | grep '^[^#]' | xargs)
@@ -154,7 +168,7 @@ if [ -f "${VIRTUALENV_ACTIVATE}" ]; then
 else
     prompt "It seems ${VIRTUALENV_FULL_PATH} is a broken virtualenv."
     prompt "You may need to remove it and run 'pyenv up' again."
-    exit -1
+    exit 1
 fi
 
 
