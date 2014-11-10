@@ -19,6 +19,16 @@ EOF
 }
 
 @test "should show virtualenvs" {
+    rm -rf "$PYENV_ROOT/virtualenvs/foo"
     run pyenv up --list
     [ "$status" -eq 0 ]
+    assert_equal "${lines[0]}" "There is nothing :("
+
+    mkdir -p "$PYENV_ROOT/virtualenvs/foo/bin"
+    touch "$PYENV_ROOT/virtualenvs/foo/bin/activate"
+    run pyenv up --list
+    [ "$status" -eq 0 ]
+    assert_equal "${lines[0]}" "Existent virtualenvs:"
+    assert_equal "${lines[1]}" " * foo ($PYENV_ROOT/virtualenvs/foo)"
+    rm -rf "$PYENV_ROOT/virtualenvs/foo"
 }
