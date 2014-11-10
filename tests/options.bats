@@ -21,4 +21,5 @@ EOF
 @test "should show virtualenvs" {
     run pyenv up --list
     [ "$status" -eq 0 ]
+    assert_equal "${lines[0]}" "There is nothing :("
 }
