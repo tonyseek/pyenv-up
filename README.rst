@@ -6,6 +6,12 @@ pyenv-up
 Startup pyenv_ and virtualenv_ through ``pyenv up``.
 
 
+Screencast
+----------
+
+.. image:: http://tonyseek.github.io/media/pyenv-up-screencast.gif
+
+
 Installation
 ------------
 
