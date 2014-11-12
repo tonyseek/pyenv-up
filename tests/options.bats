@@ -27,10 +27,13 @@ EOF
     assert_equal "${lines[0]}" "There is nothing :("
 
     mkdir -p "$PYENV_ROOT/virtualenvs/foo/bin"
+    mkdir -p "$PYENV_ROOT/virtualenvs/bar/bin"
     touch "$PYENV_ROOT/virtualenvs/foo/bin/activate"
+    touch "$PYENV_ROOT/virtualenvs/bar/bin/activate"
+
     run pyenv up --list
     [ "$status" -eq 0 ]
     assert_equal "${lines[0]}" "Existing virtualenvs:"
-    assert_equal "${lines[1]}" " - foo ($PYENV_ROOT/virtualenvs/foo)"
-    rm -rf "$PYENV_ROOT/virtualenvs/foo"
+    assert_equal "${lines[1]}" " - bar ($PYENV_ROOT/virtualenvs/bar)"
+    assert_equal "${lines[2]}" " - foo ($PYENV_ROOT/virtualenvs/foo)"
 }

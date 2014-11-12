@@ -53,7 +53,7 @@ option_list() {
         exit 1
     fi
 
-    local virtualenvs="$(ls ${virtualenvsdir})"
+    local virtualenvs="$(ls ${virtualenvsdir} | sort)"
     if [ -z "${virtualenvs}" ]; then
         echo "There is nothing :(" >&2
         exit 0
