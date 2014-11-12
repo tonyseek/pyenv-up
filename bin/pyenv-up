@@ -59,11 +59,11 @@ option_list() {
         exit 0
     fi
 
-    echo "Existent virtualenvs:" >&2
+    echo "Existing virtualenvs:" >&2
     for name in $virtualenvs; do
         local virtualenvpath="${virtualenvsdir}/${name}"
         if [ -f "${virtualenvpath}/bin/activate" ]; then
-            echo -n ' * ' >&2
+            echo -n ' - ' >&2
             echo -n ${name}
             echo -n " (${virtualenvpath})" >&2
             echo
