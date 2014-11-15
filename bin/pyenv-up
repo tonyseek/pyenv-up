@@ -161,10 +161,23 @@ if [ -z "${VIRTUALENV_NAME}" ]; then
     prompt " https://github.com/tonyseek/pyenv-up/issues"
     exit 1
 fi
+# locates the virtualenv command
+VIRTUALENV_CMD="$(pyenv-which virtualenv 2>/dev/null; exit 0)"
+if [ -z "${VIRTUALENV_CMD}" ]; then
+    BUILTIN_VENV_CMD="$(pyenv-which pyvenv 2>/dev/null; exit 0)"
+    if [ -z "${BUILTIN_VENV_CMD}" ]; then
+        prompt "The virtualenv command not found: 'virtualenv' or 'pyvenv'."
+        prompt "You may want to install it with 'pip install virtualenv'."
+        exit 1
+    fi
+    # fallback to pyvenv (the standard library included implementation)
+    # only works in Python 3.3+
+    VIRTUALENV_CMD="${BUILTIN_VENV_CMD}"
+fi
 VIRTUALENV_FULL_PATH="${VIRTUALENV_DIR}/${VIRTUALENV_NAME}"
-VIRTUALENV_PYTHON_PATH="$(pyenv-which python)"
+VIRTUALENV_PYTHON_PATH="$(pyenv-which python 2>/dev/null; exit 0)"
 VIRTUALENV_OPTS=""
-if [ -f "${VIRTUALENV_PYTHON_PATH}" ]; then
+if [ -f "${VIRTUALENV_PYTHON_PATH}" ] && [ -z "${BUILTIN_VENV_CMD}" ]; then
     VIRTUALENV_OPTS="${VIRTUALENV_OPTS} -p ${VIRTUALENV_PYTHON_PATH}"
 fi
 if [ $RENEW_VIRTUALENV -eq 1 ]; then
@@ -200,10 +213,15 @@ if [ ! -d "${VIRTUALENV_FULL_PATH}" ]; then
         case $ANSWER in
             [Yy]* )
                 prompt_hr
-                virtualenv ${VIRTUALENV_OPTS} ${VIRTUALENV_FULL_PATH}
+                ${VIRTUALENV_CMD} ${VIRTUALENV_OPTS} ${VIRTUALENV_FULL_PATH}
                 # install the latest setuptools and pip
-                $VIRTUALENV_FULL_PATH/bin/pip install -U setuptools
-                $VIRTUALENV_FULL_PATH/bin/pip install -U pip
+                if [ -n "${BUILTIN_VENV_CMD}" ]; then
+                    mkdir -p "${VIRTUALENV_FULL_PATH}/src"
+                    curl https://bootstrap.pypa.io/get-pip.py > "${VIRTUALENV_FULL_PATH}/src/get-pip.py"
+                    "${VIRTUALENV_FULL_PATH}/bin/python" "${VIRTUALENV_FULL_PATH}/src/get-pip.py"
+                fi
+                "${VIRTUALENV_FULL_PATH}/bin/pip" install -U setuptools
+                "${VIRTUALENV_FULL_PATH}/bin/pip" install -U pip
                 prompt_hr
                 prompt "The virtualenv '${VIRTUALENV_NAME}' has been created."
                 break
