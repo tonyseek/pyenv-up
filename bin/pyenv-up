@@ -215,8 +215,13 @@ if [ ! -d "${VIRTUALENV_FULL_PATH}" ]; then
                 prompt_hr
                 ${VIRTUALENV_CMD} ${VIRTUALENV_OPTS} ${VIRTUALENV_FULL_PATH}
                 # install the latest setuptools and pip
-                $VIRTUALENV_FULL_PATH/bin/pip install -U setuptools
-                $VIRTUALENV_FULL_PATH/bin/pip install -U pip
+                if [ -n "${BUILTIN_VENV_CMD}" ]; then
+                    mkdir -p "${VIRTUALENV_FULL_PATH}/src"
+                    curl https://bootstrap.pypa.io/get-pip.py > "${VIRTUALENV_FULL_PATH}/src/get-pip.py"
+                    "${VIRTUALENV_FULL_PATH}/bin/python" "${VIRTUALENV_FULL_PATH}/src/get-pip.py"
+                fi
+                "${VIRTUALENV_FULL_PATH}/bin/pip" install -U setuptools
+                "${VIRTUALENV_FULL_PATH}/bin/pip" install -U pip
                 prompt_hr
                 prompt "The virtualenv '${VIRTUALENV_NAME}' has been created."
                 break
