@@ -11,7 +11,7 @@ load test_helper
 @test "acquire virtualenv command" {
     echo "2.7.8" > .python-version
     echo "${TESTING_VENV_NAME}" > .python-virtualenv
-    pyenv exec pip uninstall -yq --log-file=/dev/null virtualenv
+    pyenv exec pip uninstall -yq virtualenv || true
     run capture-and-term.py -- pyenv up
     assert_equal "${lines[0]}" "pyenv: The virtualenv command not found: 'virtualenv' or 'pyvenv'."
 }
