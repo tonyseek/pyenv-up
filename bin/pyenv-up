@@ -292,4 +292,4 @@ fi
 #
 # start the shell
 #
-exec ${SHELL:-/bin/sh}
+exec ${SHELL:-/bin/sh} -i
