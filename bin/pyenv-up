@@ -42,6 +42,7 @@ option_usage() {
     echo "Options:" >&2
     echo -e '\t'"--help/-h"'\t'"Show help information." >&2
     echo -e '\t'"--renew/-r"'\t'"Destroy the virtualenv and re-create it." >&2
+    echo -e '\t'"--destroy/-d"'\t'"Destroy the virtualenv but not re-create it." >&2
     echo -e '\t'"--list/-l"'\t'"List all existent virtualenvs." >&2
     exit 0
 }
@@ -73,11 +74,13 @@ option_list() {
 }
 
 RENEW_VIRTUALENV=0
+DESTROY_VIRTUALENV=0
 
 case $1 in
     --help | --usage | -h ) option_usage;;
     --list | -l ) option_list;;
     --renew | -r ) RENEW_VIRTUALENV=1;;
+    --destroy | -d ) DESTROY_VIRTUALENV=1;;
 esac
 
 #
@@ -180,7 +183,7 @@ VIRTUALENV_OPTS=""
 if [ -f "${VIRTUALENV_PYTHON_PATH}" ] && [ -z "${BUILTIN_VENV_CMD}" ]; then
     VIRTUALENV_OPTS="${VIRTUALENV_OPTS} -p ${VIRTUALENV_PYTHON_PATH}"
 fi
-if [ $RENEW_VIRTUALENV -eq 1 ]; then
+if [ $RENEW_VIRTUALENV -eq 1 ] || [ $DESTROY_VIRTUALENV -eq 1 ]; then
     prompt "Are you sure to destory ${VIRTUALENV_FULL_PATH}?"
     while true; do
         prompt_inline "(y/N) "
@@ -200,7 +203,7 @@ if [ $RENEW_VIRTUALENV -eq 1 ]; then
         esac
     done
 fi
-if [ ! -d "${VIRTUALENV_FULL_PATH}" ]; then
+if [ ! -d "${VIRTUALENV_FULL_PATH}" ] && [ ! $DESTROY_VIRTUALENV -eq 1 ]; then
     prompt "The virtualenv '${VIRTUALENV_NAME}' has not been created yet."
     prompt "Do you need to create it now?"
 
